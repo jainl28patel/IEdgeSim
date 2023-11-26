@@ -1,7 +1,24 @@
 import socket
 import struct
 import threading
+import json
+import base64
 
+CLOUD_HOST = "127.0.0.1"
+CLOUD_PORT = 7897 
+
+class Server:
+    def __init__(self, host: str, port: int):
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.connect((host, port))
+    
+    def send_to_cloud(self, payload: str):
+        msg = {
+            'protocol' : 'coap' ,
+            'payload': payload
+        }
+        msg = json.dumps(msg)
+        self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
 
 class ThreadSafeResourceRepository:
     def __init__(self):
@@ -27,6 +44,8 @@ class ThreadSafeResourceRepository:
 
 
 class CoAPServer:
+    server = Server(CLOUD_HOST, CLOUD_PORT)
+    
     def __init__(self, bind_address, bind_port, resource_repository):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_socket.bind((bind_address, bind_port))
@@ -84,7 +103,17 @@ class CoAPServer:
         print(f"  Message ID: {message_id}")
         print(f"  URI: {uri}")
         print(f"  Payload: {payload}")
+        
+        cloudPayload = {
+            'method': self._get_method_name(method_code_value),
+            'message_id' : message_id,
+            'uri': uri,
+            'data': payload
+        }
 
+        cloudPayload = json.dumps(cloudPayload) 
+        CoAPServer.server.send_to_cloud(cloudPayload)
+        
         response_payload = None
         # Process the CoAP request and prepare the response
         response_code = (2 << 5) | 3   # VALID by default

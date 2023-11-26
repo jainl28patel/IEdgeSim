@@ -198,13 +198,17 @@ if __name__ == "__main__":
     coap_client = CoAPClientWithCaching("localhost", 5683, edge_cache)  # Adjust server address and port
     # for i in range(5):
     #     coap_client.send_get_request("/hello")
-
-    # Example: Send POST request
-    coap_client.send_post_request("/roof_sensor", "25.61728, 12.412, 29.111, 81.1920")
-    coap_client.send_post_request("/back_sensor", "32.81292, 52.531, 18.019, 07.888")
-    coap_client.send_post_request("/front_sensor", "32.81292, 52.531, 18.019, 07.888")
-    # Example: Send PUT request
-    coap_client.send_put_request("/wall_sensor", "32.81292, 52.531, 18.019, 07.888")
-    coap_client.send_get_request("/back_sensor")
-    # Example: Send DELETE request
-    coap_client.send_delete_request("/telemetry")
+    while True:
+        # Example: Send POST request
+        time.sleep(1)
+        coap_client.send_post_request("/roof_sensor", "25.61728, 12.412, 29.111, 81.1920")
+        coap_client.send_post_request("/back_sensor", "32.81292, 52.531, 18.019, 07.888")
+        time.sleep(1)
+        coap_client.send_post_request("/front_sensor", "32.81292, 52.531, 18.019, 07.888")
+        # Example: Send PUT request
+        time.sleep(1)
+        coap_client.send_put_request("/wall_sensor", "32.81292, 52.531, 18.019, 07.888")
+        coap_client.send_get_request("/back_sensor")
+        # Example: Send DELETE request
+        time.sleep(1)
+        coap_client.send_delete_request("/telemetry")
