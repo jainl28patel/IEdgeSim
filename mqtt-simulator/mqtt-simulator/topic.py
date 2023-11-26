@@ -22,6 +22,10 @@ class Server:
         }
         msg = json.dumps(msg)
         self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
+    
+    def recv_from_cloud(self) -> str:
+        data = self._socket.recv(1024)
+        return data
 
 class Topic(ABC):
     with open('../config/settings.json') as f:
@@ -71,8 +75,15 @@ class Topic(ABC):
         while self.loop:
             payload = self.generate_payload()
             self.old_payload = payload
-            self.client.publish(topic=self.topic_url, payload=json.dumps(payload), qos=self.topic_client_settings.qos, retain=self.topic_client_settings.retain)
+            self.client.publish(topic=self.topic_url, payload=json.dumps(payload), qos=self.topic_client_settings.qos, retain=self.topic_client_settings.retain)            
+            
+            t1 = time.time()
             Topic.server.send_to_cloud(json.dumps(payload))
+            responseCloud = Topic.server.recv_from_cloud()
+            t2 = time.time()
+            timeElasped = t2 - t1
+            print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+            
             time.sleep(self.topic_client_settings.time_interval)
 
     def on_publish(self, client, userdata, result):

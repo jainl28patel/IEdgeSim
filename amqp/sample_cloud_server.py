@@ -1,4 +1,4 @@
-import socket
+import socket,time
 
 def start_server(host, port):
     # Create a socket object
@@ -25,6 +25,8 @@ def start_server(host, port):
 
             message = data.decode("utf-8")
             print(f"Received message: {message}")
+            time.sleep(2)
+            client_socket.send(message.encode())
 
         # Close the client socket
         client_socket.close()

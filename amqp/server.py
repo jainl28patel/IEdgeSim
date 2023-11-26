@@ -32,6 +32,10 @@ class Server:
         }
         msg = json.dumps(msg)
         self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
+    
+    def recv_from_cloud(self) -> str:
+        data = self._socket.recv(1024)
+        return data
 
 
 import time
@@ -61,4 +65,11 @@ if __name__ == "__main__":
         payload = client.recv().decode()
         print(payload)
         server.send_to_cloud(payload)
+        t1 = time.time()
+        responseCloud = server.recv_from_cloud()
+        t2 = time.time()
+        timeElasped = t2 - t1
+        print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+        
+        
         time.sleep(1)
