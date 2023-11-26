@@ -6,8 +6,30 @@ from abc import ABC, abstractmethod
 import paho.mqtt.client as mqtt
 from client_settings import ClientSettings
 from expression_evaluator import ExpressionEvaluator
+import socket 
+import base64
+
+
+class Server:
+    def __init__(self, host: str, port: int):
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.connect((host, port))
+    
+    def send_to_cloud(self, payload: str):
+        msg = {
+            'protocol' : 'mqtt' ,
+            'payload': payload
+        }
+        msg = json.dumps(msg)
+        self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
 
 class Topic(ABC):
+    with open('../config/settings.json') as f:
+        config = json.load(f)
+    cloud_url = config.get('CLOUD_SERVER_URL', 'localhost')
+    cloud_port = config.get('CLOUD_SERVER_PORT', 7897)
+    server = Server(cloud_url, cloud_port)
+    
     def __init__(self, broker_url: str, broker_port: int, broker_protocol: int, topic_url: str, topic_data: list[object], topic_client_settings: ClientSettings):
         self.broker_url = broker_url
         self.broker_port = broker_port
@@ -50,6 +72,7 @@ class Topic(ABC):
             payload = self.generate_payload()
             self.old_payload = payload
             self.client.publish(topic=self.topic_url, payload=json.dumps(payload), qos=self.topic_client_settings.qos, retain=self.topic_client_settings.retain)
+            Topic.server.send_to_cloud(json.dumps(payload))
             time.sleep(self.topic_client_settings.time_interval)
 
     def on_publish(self, client, userdata, result):
