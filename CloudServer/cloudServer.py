@@ -72,7 +72,7 @@ def handle_zigbee(data,protocol):
 
 def handle_client(clientsocket, address):
     data = clientsocket.recv(1024)
-    msg = json.loads(base64.b64decode(data).decode())
+    msg = json.loads(base64.b64decode(data).decode().strip())
 
     if msg['protocol'] == 'mqtt':
         handle_mqtt(msg['payload'],msg['protocol'])

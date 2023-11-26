@@ -2,7 +2,7 @@
     "BROKER_URL": "mqtt.eclipseprojects.io",
     "BROKER_PORT": 1883,
     "CLOUD_SERVER_URL": "127.0.0.1",
-    "CLOUD_SERVER_PORT": 7897,
+    "CLOUD_SERVER_PORT": 8000,
     "TOPICS": [
         {
             "TYPE": "multiple",

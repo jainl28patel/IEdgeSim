@@ -10,14 +10,14 @@ import json
 
 data_processing_frac = {
     'mqtt': 80,
-    'ampq': 85,
+    'amqp': 85,
     'coap': 70,
     'zigbee': 75
 }
 
 processing_delays_size_frac = {
     'mqtt': 20,
-    'ampq': 10,
+    'amqp': 10,
     'coap': 30,
     'zigbee': 25
 }
@@ -55,8 +55,6 @@ def handle_mqtt(data,protocol):
 
 def handle_ampq(data,protocol):
     size = sys.getsizeof(json.loads(base64.b64decode(data).decode())['payload'])
-    print(size)
-    print(data)
     percent_data_to_process = random.randrange(
         start=int(data_processing_frac[protocol] - PERCENT_DELTA_DATA),
         stop=int(data_processing_frac[protocol] + PERCENT_DELTA_DATA)
@@ -77,13 +75,12 @@ def handle_ampq(data,protocol):
         retData = client_socket.recv(1024)
         client_socket.close()
 
+    print("delay : ", delay)
     time.sleep(delay/1000)
     return data
 
 def handle_coap(data,protocol):
     size = sys.getsizeof(json.loads(base64.b64decode(data).decode())['payload'])
-    print(size)
-    print(data)
     percent_data_to_process = random.randrange(
         start=int(data_processing_frac[protocol] - PERCENT_DELTA_DATA),
         stop=int(data_processing_frac[protocol] + PERCENT_DELTA_DATA)
@@ -104,13 +101,12 @@ def handle_coap(data,protocol):
         retData = client_socket.recv(1024)
         client_socket.close()
 
+    print("delay : ", delay)
     time.sleep(delay/1000)
     return data
 
 def handle_zigbee(data,protocol):
     size = sys.getsizeof(json.loads(base64.b64decode(data).decode())['payload'])
-    print(size)
-    print(data)
     percent_data_to_process = random.randrange(
         start=int(data_processing_frac[protocol] - PERCENT_DELTA_DATA),
         stop=int(data_processing_frac[protocol] + PERCENT_DELTA_DATA)
@@ -131,6 +127,7 @@ def handle_zigbee(data,protocol):
         retData = client_socket.recv(1024)
         client_socket.close()
 
+    print("delay : ", delay)
     time.sleep(delay/1000)
     return data
 
@@ -139,11 +136,12 @@ def handle_client(clientsocket, address):
         data = clientsocket.recv(1024)
         if data == b'':
             continue
-        msg = json.loads(base64.b64decode(data).decode())
+        msg = json.loads(base64.b64decode(data).decode().strip())
+        print(msg)
  
         if msg['protocol'] == 'mqtt':
             handle_mqtt(data,msg['protocol'])
-        elif msg['protocol'] == 'ampq':
+        elif msg['protocol'] == 'amqp':
             handle_ampq(data,msg['protocol'])
         elif msg['protocol'] == 'coap':
             handle_coap(data,msg['protocol'])

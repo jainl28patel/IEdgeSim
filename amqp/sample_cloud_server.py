@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Set the host and port
     print('Starting listening server: ')
     host = "127.0.0.1"  # localhost
-    port = 7897
+    port = 8000
 
     # Start the server
     start_server(host, port)

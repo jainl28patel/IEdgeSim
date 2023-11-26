@@ -127,7 +127,7 @@ class Server:
                     "payload" : msg[2]
                 }
                 print(f"Received message: {data['payload']} at node {data['node']}")
-                self.cloud.send_to_cloud(base64.urlsafe_b64encode(json.dumps(data).encode()).decode())
+                self.cloud.send_to_cloud(base64.b64encode(json.dumps(data).encode()).decode())
             if message.startswith("register:"):
                 client_address = message.split(":", 1)[1]
                 print(f"Client addr {client_address}")

@@ -39,7 +39,7 @@ import time
 if __name__ == "__main__":
     # initializes cloud server
     cloud_host = "127.0.0.1"
-    cloud_port = 7897
+    cloud_port = 8000
     server = Server(cloud_host,cloud_port)
     
     #amqp client
