@@ -2,10 +2,11 @@ import socket
 import struct
 import threading
 import json
+import time
 import base64
 
 CLOUD_HOST = "127.0.0.1"
-CLOUD_PORT = 7897 
+CLOUD_PORT = 8000
 
 class Server:
     def __init__(self, host: str, port: int):
@@ -19,6 +20,11 @@ class Server:
         }
         msg = json.dumps(msg)
         self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
+             
+    def recv_from_cloud(self) -> str:
+        data = self._socket.recv(1024)
+        return data
+        
 
 class ThreadSafeResourceRepository:
     def __init__(self):
@@ -104,15 +110,6 @@ class CoAPServer:
         print(f"  URI: {uri}")
         print(f"  Payload: {payload}")
         
-        cloudPayload = {
-            'method': self._get_method_name(method_code_value),
-            'message_id' : message_id,
-            'uri': uri,
-            'data': payload
-        }
-
-        cloudPayload = json.dumps(cloudPayload) 
-        CoAPServer.server.send_to_cloud(cloudPayload)
         
         response_payload = None
         # Process the CoAP request and prepare the response
@@ -159,6 +156,21 @@ class CoAPServer:
         for key, value in self.resource_repository.get_all_resources().items():
             print(f"URI: {key}, Data: {value}")
 
+        cloudPayload = {
+            'method': self._get_method_name(method_code_value),
+            'message_id' : message_id,
+            'uri': uri,
+            'data': payload
+        }
+
+        cloudPayload = json.dumps(cloudPayload) 
+        t1 = time.time()
+        CoAPServer.server.send_to_cloud(cloudPayload)
+        responseCloud = CoAPServer.server.recv_from_cloud()
+        t2 = time.time()
+        timeElasped = t2 - t1
+        print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+         
         response = self._build_coap_response(response_code, message_id, uri, response_payload)
         self.server_socket.sendto(response, client_address)
 
