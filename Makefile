@@ -1,32 +1,32 @@
-buildCloudServer:
-	@echo "Building Cloud Server"
-	cd ./CloudServer && docker build -t cloud-server .
-	pwd
-
-buildEdgeNetwork:
-	@echo "Building Edge Network"
-
-buildNormalNetwork:
-	@echo "Building Normal Network"
-	cd ./NormalNetwork/iotnode && docker build -t normal-network .
-
-runCloudServer:
-	@echo "Running Cloud Server"
-	docker run -it --rm --network="host" --name cloud-server cloud-server
+buildImage:
+	@echo "------------------ Building Edge Network ------------------"
+	cd ./CloudServer && docker build -t cloudserver .
+	cd ./EdgeServer && docker build -t edgeserver .
+	cd ./amqp && docker build -t amqp .
+	cd ./CoAP && docker build -t coap .
+	cd ./mqtt-simulator && docker build -t mqtt-simulator .
+	cd ./HaLow && docker build -t halow .
+	cd ./Zigbee && docker build -t zigbee .
 
 runEdgeNetwork:
-	@echo "Running Edge Network"
+	docker run -it --rm --network="host" --name cloudserver cloudserver
+	docker run -it --rm --network="host" --name edgeserver edgeserver
+	docker run -it --rm --network="host" --name amqp amqp
+	docker run -it --rm --network="host" --name coap coap
+	docker run -it --rm --network="host" --name mqtt-simulator mqtt-simulator
+	docker run -it --rm --network="host" --name halow halow
+	docker run -it --rm --network="host" --name zigbee zigbee
 
 runNormalNetwork:
-	@echo "Running Normal Network"
-	docker run -it --rm --network="host" --name normal-network normal-network
-
-runAll:
-	@echo "TODO"
+	docker run -it --rm --network="host" --name cloudserver cloudserver
+	docker run -it --rm -p 9000:8000 --name amqp amqp
+	docker run -it --rm -p 9000:8000 --name coap coap
+	docker run -it --rm -p 9000:8000 --name mqtt-simulator mqtt-simulator
+	docker run -it --rm -p 9000:8000 --name halow halow
+	docker run -it --rm -p 9000:8000 --name zigbee zigbee
 
 clean:
 	@echo "TODO"
 
 removeImages:
 	@echo "Removing Images"
-	docker image rm -f cloud-server | docker image rm -f normal-network
