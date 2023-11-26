@@ -114,4 +114,4 @@ if __name__ == "__main__":
         threads.append(cli)
         i+=1
         cli.start()
-        time.sleep(0.5)
+        time.sleep(1)
