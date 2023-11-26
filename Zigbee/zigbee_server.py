@@ -3,6 +3,8 @@
 import threading
 import socket
 import uuid
+import base64
+import json
 
 class Node:
     def __init__(self, name):
@@ -83,6 +85,18 @@ class Network:
             if node != sender:
                 node.route_message(sender.name, node.name, message)
 
+class Cloud:
+    def __init__(self, host: str, port: int):
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.connect((host, port))
+    
+    def send_to_cloud(self, payload: str):
+        msg = {
+            'protocol' : 'zigbee' ,
+            'payload': payload,
+        }
+        msg = json.dumps(msg)
+        self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
 
 class Server:
     def __init__(self, host, port):
@@ -92,6 +106,7 @@ class Server:
         self.port = port
         self.socket.bind((self.host, self.port))
         self.network = Network(self)
+        self.cloud = Cloud("127.0.0.1",7897)
 
     def start(self):
         self.socket.listen()
@@ -105,9 +120,17 @@ class Server:
     def _handle_client(self, client: socket.socket):
         with client:
             message = client.recv(1024).decode()
-            print(f"Received message: {message}")
+            msg = message.split(":")
+            if(len(msg) > 2):
+                data = {
+                    "node" : msg[1],
+                    "payload" : msg[2]
+                }
+                print(f"Received message: {data['payload']} at node {data['node']}")
+                self.cloud.send_to_cloud(base64.urlsafe_b64encode(json.dumps(data).encode()).decode())
             if message.startswith("register:"):
                 client_address = message.split(":", 1)[1]
+                print(f"Client addr {client_address}")
                 node = next((n for n in self.network.nodes if n.address == client_address), None)
                 if not node:
                     node = Node(client_address)

@@ -1,5 +1,5 @@
 # client.py
-
+import threading
 import socket
 import uuid
 class Node:
@@ -97,11 +97,16 @@ class Client:
         print(f"Sending message: {message}")
         self.socket.sendall(f"{self.address}:{message}".encode())
 
-if __name__ == "__main__":
+def thread_function(num):
     client = Client('127.0.0.1', 5000)
     client.connect()
     client.register()
-    client.send_message('Hello from client')
+    client.send_message(f'Hello from client {num}')
 
 
-
+if __name__ == "__main__":
+    threads = list()
+    for i in range(5):
+        cli = threading.Thread(args=(i,),target=thread_function)
+        threads.append(cli)
+        cli.start()
