@@ -106,7 +106,7 @@ class Server:
         self.port = port
         self.socket.bind((self.host, self.port))
         self.network = Network(self)
-        self.cloud = Cloud("127.0.0.1",7897)
+        self.cloud = Cloud("127.0.0.1",8000)
 
     def start(self):
         self.socket.listen()

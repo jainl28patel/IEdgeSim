@@ -2,6 +2,8 @@
 import threading
 import socket
 import uuid
+import time
+
 class Node:
     def __init__(self, name):
         self.name = name
@@ -106,7 +108,10 @@ def thread_function(num):
 
 if __name__ == "__main__":
     threads = list()
-    for i in range(5):
+    i = 0
+    while(True):
         cli = threading.Thread(args=(i,),target=thread_function)
         threads.append(cli)
+        i+=1
         cli.start()
+        time.sleep(0.5)
