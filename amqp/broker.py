@@ -47,9 +47,14 @@ class Broker:
     def _handle_client(self, client: socket.socket):
         with client:
             # Receive key
-            key = client.recv(1024).decode()
-            print(key)
-            print(type(key))
+            try:
+                key = client.recv(1024).decode()
+                print(key)
+                print(type(key))
+            except Exception as e:
+                print("Error receiving key: {}".format(e))
+                client.sendall("Error receiving key: {}\nClosing your connection".format(e).encode())
+                return
             # Bind client to exchange
             try:
                 self._exchange.bind(key, client)
@@ -66,8 +71,16 @@ class Broker:
                     print("Closing connection to client: {}".format(client))
                     break
                 # Parse message as json
-                message = base64.b64decode(message)
-                msg_json = json.loads(message)
+                try:
+                    message = base64.b64decode(message)
+                except:
+                    client.sendall(b"Message is not properly base64 encoded")
+                    continue
+                try:
+                    msg_json = json.loads(message)
+                except:
+                    client.sendall(b"Message is not valid json")
+                    continue
                 # Check if message has routing key
                 if 'key' not in msg_json:
                     client.sendall(b"Message has no routing key")
