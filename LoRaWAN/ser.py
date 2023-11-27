@@ -4,12 +4,8 @@ import base64
 import json
 
 SERVER_IP = '127.0.0.50'
-SERVER_PORT = 12345
-
-
+SERVER_PORT = 5000
 KEY = "Networks_Project"
-
-
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000
 
@@ -29,10 +25,6 @@ class Server:
     def recv_from_cloud(self) -> str:
         data = self._socket.recv(1024)
         return data
-        
-
-
-
 
 class LoRaWAN_Packet:
     def __init__ (self, data):
@@ -48,11 +40,8 @@ class LoRaWAN_Packet:
     def encrypt(self):
         return self.decrypt().encode()
     
-    
-
-
 class GateWay:
-    # server = Server(CLOUD_HOST, CLOUD_PORT)
+    server = Server(CLOUD_HOST, CLOUD_PORT)
     def __init__(self):
         self.server = Server(CLOUD_HOST, CLOUD_PORT)
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -77,11 +66,13 @@ class GateWay:
             packet = LoRaWAN_Packet(data.decode())
             decrypted_data = packet.decrypt()
             print("Received data:", decrypted_data)
+            t1 = time.time()
             self.server.send_to_cloud(decrypted_data)
             print("Data sent to Cloud")
             response_cloud = self.server.recv_from_cloud()
+            t2 = time.time()
             print(f"Response from the Cloud {response_cloud}")
-            
+            print(f"Delay: {(t2-t1)*1000}ms")
 
 if __name__ == "__main__":
     server = GateWay()
@@ -89,5 +80,3 @@ if __name__ == "__main__":
         server.start()
     except KeyboardInterrupt:
         server.stop()
-
-
