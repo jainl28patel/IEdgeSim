@@ -2,12 +2,17 @@ import socket
 import threading
 import base64
 import json
+import sys
+import time
 
 SERVER_IP = '127.0.0.50'
 SERVER_PORT = 5000
 KEY = "Networks_Project"
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000
+
+f = open("./log.txt","w+")
+sys.stdout = f
 
 class Server:
     def __init__(self, host: str, port: int):
@@ -71,7 +76,7 @@ class GateWay:
             print("Data sent to Cloud")
             response_cloud = self.server.recv_from_cloud()
             t2 = time.time()
-            print(f"Response from the Cloud {response_cloud}")
+            print(f"Response from the Cloud: {response_cloud.decode()}")
             print(f"Delay: {(t2-t1)*1000}ms")
 
 if __name__ == "__main__":

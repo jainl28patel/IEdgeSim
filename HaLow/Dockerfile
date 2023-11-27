@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./client.py", "&&", "python", "./server.py" ]
+CMD chmod +x run.sh
+
+ENTRYPOINT ["./run.sh"]

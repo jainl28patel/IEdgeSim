@@ -4,6 +4,10 @@ from typing import Dict
 import base64
 import json
 import time
+import sys
+
+f = open("./log.txt","w+")
+sys.stdout = f
 
 class State:
     def __init__(self) -> None:
