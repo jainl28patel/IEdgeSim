@@ -100,7 +100,7 @@ class Client:
         self.socket.sendall(f"{self.address}:{message}".encode())
 
 def thread_function(num):
-    client = Client('127.0.0.1', 5000)
+    client = Client('127.0.0.1', 5003)
     client.connect()
     client.register()
     client.send_message(f'Hello from client {num}')

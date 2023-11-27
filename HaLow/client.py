@@ -20,7 +20,7 @@ class Client:
 
 def thread_function(num: int):
     time.sleep(num)
-    client = Client(5000)
+    client = Client(5001)
 
     client.send(b"AuthRequest")
 

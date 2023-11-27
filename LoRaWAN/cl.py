@@ -4,7 +4,7 @@ import random
 import threading
 
 SERVER_IP = '127.0.0.50'
-SERVER_PORT = 5000
+SERVER_PORT = 5002
 KEY = "Networks_Project"
 
 class LoRaWAN_Packet:
