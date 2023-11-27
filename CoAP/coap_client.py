@@ -3,6 +3,14 @@ import struct
 import random
 import time
 
+class Sensor:
+
+    def generate_random_sensor_data(self):
+        # Generate random sensor data here
+        return f"{random.uniform(0, 100)}, {random.uniform(0, 100)}, {random.uniform(0, 100)}, {random.uniform(0, 100)}"
+
+
+
 class EdgeCoAPCache:
     def __init__(self):
         self.cache = {}
@@ -192,23 +200,48 @@ class CoAPClientWithCaching:
         except Exception as e:
             print(f"Error sending/receiving CoAP DELETE request: {e}")
 
+    def continuously_send_requests(self, num_requests):
+        sensor = Sensor()
+        sensors = ["/roof", "/front_yard", "/back_yard", "/kitchen", "/bedroom", "/living_room"]
+        requests = ["GET", "POST", "PUT", "DELETE"]
+
+        for _ in range(num_requests):
+            time.sleep(1)
+
+            # Randomly choose a sensor and request type
+            selected_sensor = random.choice(sensors)
+            selected_request = random.choice(requests)
+
+            # Generate random sensor data
+            sensor_data = sensor.generate_random_sensor_data()
+
+            if selected_request == "GET":
+                coap_client.send_get_request(selected_sensor)
+            elif selected_request == "POST":
+                coap_client.send_post_request(selected_sensor, sensor_data)
+            elif selected_request == "PUT":
+                coap_client.send_put_request(selected_sensor, sensor_data)
+            elif selected_request == "DELETE":
+                coap_client.send_delete_request(selected_sensor)
+
 
 if __name__ == "__main__":
     edge_cache = EdgeCoAPCache()
-    coap_client = CoAPClientWithCaching("localhost", 5683, edge_cache)  # Adjust server address and port
+    coap_client = CoAPClientWithCaching("localhost", 5683, edge_cache)
+    coap_client.continuously_send_requests(100)                # Adjust server address and port
     # for i in range(5):
     #     coap_client.send_get_request("/hello")
-    while True:
-        # Example: Send POST request
-        time.sleep(1)
-        coap_client.send_post_request("/roof_sensor", "25.61728, 12.412, 29.111, 81.1920")
-        coap_client.send_post_request("/back_sensor", "32.81292, 52.531, 18.019, 07.888")
-        time.sleep(1)
-        coap_client.send_post_request("/front_sensor", "32.81292, 52.531, 18.019, 07.888")
-        # Example: Send PUT request
-        time.sleep(1)
-        coap_client.send_put_request("/wall_sensor", "32.81292, 52.531, 18.019, 07.888")
-        coap_client.send_get_request("/back_sensor")
-        # Example: Send DELETE request
-        time.sleep(1)
-        coap_client.send_delete_request("/telemetry")
+    # while True:
+    #     # Example: Send POST request
+    #     time.sleep(1)
+    #     coap_client.send_post_request("/roof_sensor", "25.61728, 12.412, 29.111, 81.1920")
+    #     coap_client.send_post_request("/back_sensor", "32.81292, 52.531, 18.019, 07.888")
+    #     time.sleep(1)
+    #     coap_client.send_post_request("/front_sensor", "32.81292, 52.531, 18.019, 07.888")
+    #     # Example: Send PUT request
+    #     time.sleep(1)
+    #     coap_client.send_put_request("/wall_sensor", "32.81292, 52.531, 18.019, 07.888")
+    #     coap_client.send_get_request("/back_sensor")
+    #     # Example: Send DELETE request
+    #     time.sleep(1)
+    #     coap_client.send_delete_request("/telemetry")
