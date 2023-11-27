@@ -9,24 +9,31 @@ buildImage:
 	cd ./Zigbee && docker build -t zigbee .
 
 runEdgeNetwork:
-	docker run -it --rm --network="host" --name cloudserver cloudserver
-	docker run -it --rm --network="host" --name edgeserver edgeserver
-	docker run -it --rm --network="host" --name amqp amqp
-	docker run -it --rm --network="host" --name coap coap
-	docker run -it --rm --network="host" --name mqtt-simulator mqtt-simulator
-	docker run -it --rm --network="host" --name halow halow
-	docker run -it --rm --network="host" --name zigbee zigbee
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name cloudserver cloudserver
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name edgeserver edgeserver
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name amqp amqp
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name coap coap
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name mqtt-simulator mqtt-simulator
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name halow halow
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name zigbee zigbee
 
 runNormalNetwork:
-	docker run -it --rm --network="host" --name cloudserver cloudserver
-	docker run -it --rm -p 9000:8000 --name amqp amqp
-	docker run -it --rm -p 9000:8000 --name coap coap
-	docker run -it --rm -p 9000:8000 --name mqtt-simulator mqtt-simulator
-	docker run -it --rm -p 9000:8000 --name halow halow
-	docker run -it --rm -p 9000:8000 --name zigbee zigbee
+	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name cloudserver cloudserver
+	docker run -it --rm -p 9000:8000 -v "$(PWD)":/usr/src/app --name amqp amqp
+	docker run -it --rm -p 9000:8000 -v "$(PWD)":/usr/src/app --name coap coap
+	docker run -it --rm -p 9000:8000 -v "$(PWD)":/usr/src/app --name mqtt-simulator mqtt-simulator
+	docker run -it --rm -p 9000:8000 -v "$(PWD)":/usr/src/app --name halow halow
+	docker run -it --rm -p 9000:8000 -v "$(PWD)":/usr/src/app --name zigbee zigbee
 
 clean:
-	@echo "TODO"
+	docker rm -f $(docker ps -a -q) | docker rmi -f $(docker images -q)
 
-removeImages:
-	@echo "Removing Images"
+buildTest:
+	cd ./CloudServer && docker build -t cloudserver .
+	cd ./EdgeServer && docker build -t edgeserver .
+	cd ./Zigbee && docker build -t zigbee .
+
+runTest:
+	docker run --rm --network="host" --name cloudserver cloudserver \
+	& docker run --rm --network="host" -v "$(PWD)/EdgeServer:/usr/src/app" --name edgeserver edgeserver \
+	& docker run -it --rm --network="host" -v "$(PWD)/Zigbee":/usr/src/app --name zigbee zigbee

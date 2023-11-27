@@ -6,6 +6,10 @@ import uuid
 import base64
 import json
 import time
+import sys
+
+f = open("log.txt", "w")
+sys.stdout = f
 
 class Node:
     def __init__(self, name):

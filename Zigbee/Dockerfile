@@ -8,4 +8,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./server.py", "&&", "python", "./client.py" ]
+# CMD [ "./run.sh" ]
+CMD [ "python", "./zigbee_server.py", "&", "python", "./zigbee_client.py" ]
