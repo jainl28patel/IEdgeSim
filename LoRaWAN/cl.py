@@ -3,12 +3,8 @@ import time
 import random
 import threading
 
-
-
 SERVER_IP = '127.0.0.50'
-SERVER_PORT = 12345
-
-
+SERVER_PORT = 5000
 KEY = "Networks_Project"
 
 class LoRaWAN_Packet:
@@ -24,12 +20,7 @@ class LoRaWAN_Packet:
         return check
     def encrypt(self):
         return self.decrypt().encode()
-    
-    
-
-
-
-
+        
 class Client:
     def __init__(self):
         self._port = SERVER_PORT
@@ -37,7 +28,6 @@ class Client:
         
     def send(self, data):
         self._socket.sendto(data, (SERVER_IP, SERVER_PORT))
-
 
 class Sensor:
     def __init__(self, sensor_id):
@@ -47,8 +37,6 @@ class Sensor:
         datasent = Client()
         datasent.send(data)
 
-
-
 def node_(sensor_id: int):
     sensor = Sensor(sensor_id)
     while True:
@@ -56,14 +44,9 @@ def node_(sensor_id: int):
         print(f"Sensor {sensor.sensor_id} is sending data")
         data = f"Sensor {sensor.sensor_id} - Data: {sensor.value}"
         findata = LoRaWAN_Packet(data)
-
         sensor.send_data(findata.encrypt())
-        
-        
         print("Data Sent")
         time.sleep(5)
-
-
 
 if __name__ == "__main__":
     threads = list()
@@ -71,10 +54,3 @@ if __name__ == "__main__":
         curthread = threading.Thread(target=node_, args=(i,))
         threads.append(curthread)
         curthread.start()
-
-# if __name__ == "__main__":
-#     sensor1 = Sensor(1)
-#     try:
-#         sensor1.send_data()
-#     except KeyboardInterrupt:
-#         pass
