@@ -36,8 +36,10 @@ def thread_function(num: int):
 
 
 if __name__ == "__main__":
+    time.sleep(2)
     threads = list()
     for i in range(1,6):
         z = threading.Thread(target=thread_function,args=(i,))
         threads.append(z)
         z.start()
+        time.sleep(1)

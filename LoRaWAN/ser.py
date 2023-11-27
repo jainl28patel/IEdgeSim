@@ -56,27 +56,27 @@ class GateWay:
     def start(self):
         self.is_running = True
         self.receive_thread.start()
-        f.write("Gateway started. Waiting for data...")
+        f.write("Gateway started. Waiting for data...\n")
 
     def stop(self):
         self.is_running = False
         self.server_socket.close()
         self.receive_thread.join()
-        f.write("\Gateway stopped.")
+        f.write("\Gateway stopped.\n")
 
     def receive_data(self):
         while self.is_running:
             data, address = self.server_socket.recvfrom(1024)
             packet = LoRaWAN_Packet(data.decode())
             decrypted_data = packet.decrypt()
-            f.write("Received data:", decrypted_data)
+            f.write(f"Received data: {decrypted_data}\n")
             t1 = time.time()
             self.server.send_to_cloud(decrypted_data)
-            f.write("Data sent to Cloud")
+            f.write("Data sent to Cloud\n")
             response_cloud = self.server.recv_from_cloud()
             t2 = time.time()
-            f.write(f"Response from the Cloud: {response_cloud.decode()}")
-            f.write(f"Time: {(t2-t1)*1000}ms")
+            f.write(f"Response from the Cloud: {response_cloud.decode()}\n")
+            f.write(f"Time: {(t2-t1)*1000}ms\n")
 
 if __name__ == "__main__":
     server = GateWay()

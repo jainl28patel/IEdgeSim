@@ -105,13 +105,16 @@ class CoAPServer:
         return bytes(header)
 
     def handle_request(self, data, client_address):
-        version, type_code, method_code_value, message_id, uri, payload = self._parse_coap_message(data)
-        # Process the CoAP request as needed
-        f.write(f"Received CoAP {self._get_type_name(int(type_code))} request from {client_address}:")
-        f.write(f"  The request is for : {self._get_method_name(method_code_value)}")
-        f.write(f"  Message ID: {message_id}")
-        f.write(f"  URI: {uri}")
-        f.write(f"  Payload: {payload}")
+        try:
+            version, type_code, method_code_value, message_id, uri, payload = self._parse_coap_message(data)
+            # Process the CoAP request as needed
+            f.write(f"Received CoAP {self._get_type_name(int(type_code))} request from {client_address}:")
+            f.write(f"  The request is for : {self._get_method_name(method_code_value)}")
+            f.write(f"  Message ID: {message_id}")
+            f.write(f"  URI: {uri}")
+            f.write(f"  Payload: {payload}")
+        except:
+            return
         
         
         response_payload = None

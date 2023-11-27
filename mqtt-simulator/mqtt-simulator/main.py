@@ -1,10 +1,6 @@
 import argparse
 from pathlib import Path
 from simulator import Simulator
-import sys
-
-f = open("./log.txt", "w")
-sys.stdout = f
 
 def default_settings():
     base_folder = Path(__file__).resolve().parent.parent

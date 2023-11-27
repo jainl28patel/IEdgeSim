@@ -98,38 +98,39 @@ class Server:
         with client:
             message = client.recv(1024)
             if message == b"AuthRequest":
-                f.write("Authenticating client {}".format(cid))
+                f.write("Authenticating client {}\n".format(cid))
                 # -- authentication --
                 self.clients.bind(cid, client)
-                f.write("Client {} authenticated!".format(cid))
+                f.write("Client {} authenticated!\n".format(cid))
                 client.sendall(b"Authenticated!")
 
             while True:
                 message = client.recv(1024)
                 if message == b"rts":
                     self.clients.add_send_queue(cid)
-                    f.write(self.clients.get_send_queue_len())
+                    f.write(f"Queue length: {self.clients.get_send_queue_len()}\n")
                     if self.clients.get_send_queue_len() == 1:
                         self.clients.pop_send_queue()
                 elif message == b"close":
-                    f.write("Closing connection to client: {}".format(cid))
+                    f.write("Closing connection to client: {}\n".format(cid))
                     break
                 elif self.clients.get_sender_allowed() == cid:
-                    f.write("Message from client {}: {}".format(cid, message))
+                    f.write("Message from client {}: {}\n".format(cid, message))
                     msg = {
                         "cid" : cid,
                         "data": message.decode() 
                     }
                     t1 = time.time()
                     self.cloud.send_to_cloud(json.dumps(msg))
-                    f.write(f"Data from Edge: {self.cloud.recv_from_cloud()}")
+                    f.write(f"Data from Edge: {self.cloud.recv_from_cloud()}\n")
                     t2 = time.time()
-                    f.write(f"Time: {(t2-t1)*1000}ms")
+                    f.write(f"Time: {(t2-t1)*1000}ms\n")
                     self.clients.pop_send_queue()
 
             self.clients.unbind(cid)
 
 if __name__ == "__main__":
+    time.sleep(0.3)
     print("Starting Server...")
     state = State()
     server = Server(5001, state)

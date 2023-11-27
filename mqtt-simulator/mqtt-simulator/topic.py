@@ -11,7 +11,6 @@ import base64
 import sys
 
 f = open("/tmp/logs/mqttlog.txt", "w+")
-# sys.stdout = f
 
 class Server:
     def __init__(self, host: str, port: int):
