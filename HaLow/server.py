@@ -1,6 +1,9 @@
 import threading
 import socket
 from typing import Dict
+import base64
+import json
+import time
 
 class State:
     def __init__(self) -> None:
@@ -56,13 +59,30 @@ class State:
             else:
                 raise Exception("No client found for client_id: {}".format(client_id))
 
+class Cloud:
+    def __init__(self, host: str, port: int):
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.connect((host, port))
+
+    def send_to_cloud(self, payload: str):
+        msg = {
+            'protocol' : 'halow' ,
+            'payload': payload,
+        }
+        msg = json.dumps(msg)
+        self._socket.sendall(base64.urlsafe_b64encode(msg.encode()))
+    
+    def recv_from_cloud(self) -> str:
+        return self._socket.recv(1024)
+
 class Server:
     def __init__(self, port, state: State) -> None:
         self._port = port
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.bind(('127.0.0.1', self._port))
         self.clients = state
-
+        self.cloud = Cloud("127.0.0.1",8000)
+        
     def start(self):
         self._socket.listen()
         print("Server listening on port {}".format(self._port))
@@ -78,9 +98,7 @@ class Server:
                 print("Authenticating client {}".format(cid))
                 # -- authentication --
                 self.clients.bind(cid, client)
-
                 print("Client {} authenticated!".format(cid))
-
                 client.sendall(b"Authenticated!")
 
             while True:
@@ -95,6 +113,15 @@ class Server:
                     break
                 elif self.clients.get_sender_allowed() == cid:
                     print("Message from client {}: {}".format(cid, message))
+                    msg = {
+                        "cid" : cid,
+                        "data": message.decode() 
+                    }
+                    t1 = time.time()
+                    self.cloud.send_to_cloud(json.dumps(msg))
+                    print(f"Data from Edge: {self.cloud.recv_from_cloud()}")
+                    t2 = time.time()
+                    print(f"time = {(t2-t1)*1000}ms")
                     self.clients.pop_send_queue()
 
             self.clients.unbind(cid)
