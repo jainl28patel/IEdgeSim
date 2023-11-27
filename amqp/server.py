@@ -6,6 +6,8 @@ import json
 import base64
 import sys
 
+
+print("server running")
 f = open("./log.txt", "w")
 sys.stdout = f
 
@@ -45,37 +47,37 @@ class Server:
 import time
 
 if __name__ == "__main__":
-    with open('amqplog.txt', 'w') as f:
-        sys.stdout = f
-        # initializes cloud server
-        cloud_host = "127.0.0.1"
-        cloud_port = 8000
-        server = Server(cloud_host,cloud_port)
+    time.sleep(1)
+
+    # initializes cloud server
+    cloud_host = "127.0.0.1"
+    cloud_port = 8000
+    server = Server(cloud_host,cloud_port)
+    
+    #amqp client
+    client = Client(5000)
+    
+    client.send(b"key0")
+    print(client.recv())
+    
+    # Send greeting to cloud
+    msg = {
+        'key': 'key0',
+        'payload': 'Hello Cloud from key 0!'
+    }
+    msg = json.dumps(msg)
+    client.send(base64.urlsafe_b64encode(msg.encode()))
+    
+    while True:
+        # recieve payload from broker and send to cloud
+        payload = client.recv().decode()
+        print(payload)
+        server.send_to_cloud(payload)
+        t1 = time.time()
+        responseCloud = server.recv_from_cloud()
+        t2 = time.time()
+        timeElasped = t2 - t1
+        print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
         
-        #amqp client
-        client = Client(5000)
         
-        client.send(b"key0")
-        print(client.recv())
-        
-        # Send greeting to cloud
-        msg = {
-            'key': 'key0',
-            'payload': 'Hello Cloud from key 0!'
-        }
-        msg = json.dumps(msg)
-        client.send(base64.urlsafe_b64encode(msg.encode()))
-        
-        while True:
-            # recieve payload from broker and send to cloud
-            payload = client.recv().decode()
-            print(payload)
-            server.send_to_cloud(payload)
-            t1 = time.time()
-            responseCloud = server.recv_from_cloud()
-            t2 = time.time()
-            timeElasped = t2 - t1
-            print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
-            
-            
-            time.sleep(1)
+        time.sleep(1)

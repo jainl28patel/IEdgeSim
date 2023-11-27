@@ -4,6 +4,8 @@ import socket
 import base64
 import json
 
+
+print("broker running")
 class Exchange:
     def __init__(self) -> None:
         self._lock = threading.Lock()

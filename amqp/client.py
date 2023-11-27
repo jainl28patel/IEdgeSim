@@ -7,6 +7,9 @@ import base64
 import threading
 import time
 
+
+
+print("client running")
 class Client:
     def __init__(self, port: int):
         self._port = port
@@ -46,6 +49,7 @@ def thread_function(num: int):
 
 
 if __name__ == "__main__":
+    time.sleep(2)
     threads = list()
     for i in range(1,6):
         z = threading.Thread(target=thread_function,args=(i,))
