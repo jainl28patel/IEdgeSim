@@ -1,4 +1,3 @@
 # IEdgeSim
  
-## Protocols
-1. MTTQ : https://github.com/DamascenoRafael/mqtt-simulator
+CSN-341 Network lab project
