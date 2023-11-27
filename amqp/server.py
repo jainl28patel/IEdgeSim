@@ -8,8 +8,7 @@ import sys
 
 
 print("server running")
-f = open("./log.txt", "w")
-sys.stdout = f
+f = open("/tmp/logs/AMQPserverlog.txt", "w+")
 
 class Client:
     def __init__(self, port: int):
@@ -71,13 +70,13 @@ if __name__ == "__main__":
     while True:
         # recieve payload from broker and send to cloud
         payload = client.recv().decode()
-        print(payload)
+        f.write(payload)
         server.send_to_cloud(payload)
         t1 = time.time()
         responseCloud = server.recv_from_cloud()
         t2 = time.time()
         timeElasped = t2 - t1
-        print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+        f.write(f"Time: {timeElasped*1000}\n")
         
         
         time.sleep(1)
