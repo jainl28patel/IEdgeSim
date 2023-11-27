@@ -107,6 +107,7 @@ def thread_function(num):
 
 
 if __name__ == "__main__":
+    time.sleep(1)
     threads = list()
     i = 0
     while(True):
