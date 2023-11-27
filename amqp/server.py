@@ -6,6 +6,9 @@ import json
 import base64
 import sys
 
+f = open("./log.txt", "w")
+sys.stdout = f
+
 class Client:
     def __init__(self, port: int):
         self._port = port

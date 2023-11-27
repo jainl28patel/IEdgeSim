@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./broker.py", "&", "python", "./client.py", "&", "python", "./server.py" ]
+ENTRYPOINT ["./run.sh"]
+
+# CMD [ "python", "./broker.py", "&", "python", "./client.py", "&", "python", "./server.py" ]

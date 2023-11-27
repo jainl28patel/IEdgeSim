@@ -31,9 +31,15 @@ clean:
 buildTest:
 	cd ./CloudServer && docker build -t cloudserver .
 	cd ./EdgeServer && docker build -t edgeserver .
-	cd ./Zigbee && docker build -t zigbee .
+	cd ./mqtt-simulator && docker build -t mqtt .
 
 runTest:
-	docker run --rm --network="host" --name cloudserver cloudserver \
-	& docker run --rm --network="host" -v "$(PWD)/EdgeServer:/usr/src/app" --name edgeserver edgeserver \
-	& docker run -it --rm --network="host" -v "$(PWD)/Zigbee":/usr/src/app --name zigbee zigbee
+	docker run --network="host" -v "$(PWD)/EdgeServer:/usr/src/app" --name edgeserver edgeserver 
+	docker run -it  --network="host" -v "$(PWD)/Zigbee:/usr/src/app" --name zigbee zigbee
+
+		docker run -it --network="host" -v "$(pwd)/CloudServer:/usr/src/app"  --name cloudserver cloudserver 
+	docker run -it --network="host" -v "$(pwd)/EdgeServer:/usr/src/app" --name edgeserver edgeserver 
+	docker run -it  --network="host" -v "$(pwd)/Zigbee:/usr/src/app" --name zigbee zigbee
+	docker run -it  --network="host" -v "$(pwd)/mqtt-simulator:/usr/src/app" --name mqtt-simulator mqtt-simulator
+	docker run -it  --network="host" -v "$(pwd)/CoAP:/usr/src/app" --name coap coap
+	docker run -it  --network="host" -v "$(pwd)/amqp:/usr/src/app" --name amqp amqp

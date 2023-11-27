@@ -8,7 +8,10 @@ from client_settings import ClientSettings
 from expression_evaluator import ExpressionEvaluator
 import socket 
 import base64
+import sys
 
+# f = open("../log.txt", "w+")
+# sys.stdout = f
 
 class Server:
     def __init__(self, host: str, port: int):
@@ -28,7 +31,7 @@ class Server:
         return data
 
 class Topic(ABC):
-    with open('../config/settings.json') as f:
+    with open('config/settings.json') as f:
         config = json.load(f)
     cloud_url = config.get('CLOUD_SERVER_URL', 'localhost')
     cloud_port = config.get('CLOUD_SERVER_PORT', 7897)

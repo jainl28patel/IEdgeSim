@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./coap_server.py", "&&", "python", "./coap_client.py" ]
+ENTRYPOINT ["./run.sh"]
+
+# CMD [ "python", "./coap_server.py", "&&", "python", "./coap_client.py" ]

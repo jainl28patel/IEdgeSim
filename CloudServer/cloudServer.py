@@ -8,6 +8,9 @@ import socket
 import base64
 import json
 
+f = open("./log.txt", "w")
+sys.stdout = f
+
 data_processing_frac = {
     'mqtt': 80,
     'ampq': 85,

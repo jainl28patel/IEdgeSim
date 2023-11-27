@@ -8,6 +8,9 @@ import socket
 import base64
 import json
 
+f = open("./log.txt", "w")
+sys.stdout = f
+
 data_processing_frac = {
     'mqtt': 80,
     'amqp': 85,
@@ -133,22 +136,27 @@ def handle_zigbee(data,protocol):
 
 def handle_client(clientsocket, address):
     while True:
-        data = clientsocket.recv(1024)
-        if data == b'':
-            continue
-        msg = json.loads(base64.b64decode(data).decode().strip())
-        print(msg)
- 
-        if msg['protocol'] == 'mqtt':
-            handle_mqtt(data,msg['protocol'])
-        elif msg['protocol'] == 'amqp':
-            handle_ampq(data,msg['protocol'])
-        elif msg['protocol'] == 'coap':
-            handle_coap(data,msg['protocol'])
-        elif msg['protocol'] == 'zigbee':
-            handle_zigbee(data,msg['protocol'])
+        try:
+            data = clientsocket.recv(1024)
+            if data == b'':
+                continue
+            msg = json.loads(base64.b64decode(data).decode().strip())
+            print(".................................................................data = ", data)
+            print(msg)
+    
+            if msg['protocol'] == 'mqtt':
+                handle_mqtt(data,msg['protocol'])
+            elif msg['protocol'] == 'amqp':
+                handle_ampq(data,msg['protocol'])
+            elif msg['protocol'] == 'coap':
+                handle_coap(data,msg['protocol'])
+            elif msg['protocol'] == 'zigbee':
+                handle_zigbee(data,msg['protocol'])
 
-        clientsocket.send(data)
+            clientsocket.send(data)
+        except:
+            clientsocket.send(b'')
+            continue
 
 if __name__ == "__main__":
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

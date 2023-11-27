@@ -4,9 +4,13 @@ import threading
 import json
 import time
 import base64
+import sys
 
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000
+
+f = open("./log.txt", "w")
+sys.stdout = f
 
 class Server:
     def __init__(self, host: str, port: int):

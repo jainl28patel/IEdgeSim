@@ -8,7 +8,7 @@ import json
 import time
 import sys
 
-f = open("log.txt", "w")
+f = open("./log.txt", "w")
 sys.stdout = f
 
 class Node:

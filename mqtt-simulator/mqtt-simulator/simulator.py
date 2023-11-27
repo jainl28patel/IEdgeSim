@@ -2,6 +2,11 @@ import json
 from client_settings import ClientSettings
 from topic import TopicAuto
 
+import sys
+
+# f = open("../log.txt", "w+")
+# sys.stdout = f
+
 class Simulator:
     def __init__(self, settings_file):
         self.topics = []
