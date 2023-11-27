@@ -8,8 +8,7 @@ import socket
 import base64
 import json
 
-f = open("./log.txt", "w")
-sys.stdout = f
+f = open("/tmp/logs/cloudlog.txt", "w+")
 
 data_processing_frac = {
     'mqtt': 80,
@@ -36,7 +35,9 @@ def handle_mqtt(data,protocol):
     )
     
     delay = (size * percent_delay) / 100
-    print("delay : ", delay)
+    f.write("delay : " + str(delay) + "\n")
+    f.write("data : " + str(data) + "\n")
+    f.write("size : " + str(size) + "\n")
     time.sleep(delay/1000)
     return data
 
@@ -97,11 +98,11 @@ if __name__ == "__main__":
 
     while True:
         clientsocket, address = s.accept()
-        print(f"Connection from {address} has been established!")
+        f.write(f"Connection from {address} has been established!")
         t = threading.Thread(target=handle_client, args=(clientsocket, address))
         t.start()
         thread_list.append(t)
-        print(f"Active Connections: {threading.activeCount() - 1}")
+        f.write(f"Active Connections: {threading.activeCount() - 1}")
 
         for thread in thread_list:
             if not thread.is_alive():

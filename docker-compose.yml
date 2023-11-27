@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  cloudserver:
+    build:
+      context: ./CloudServer
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  edgeserver:
+    build:
+      context: ./EdgeServer
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  coap:
+    build:
+      context: ./CoAP
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  mqtt:
+    build:
+      context: ./mqtt-simulator
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  zigbee:
+    build:
+      context: ./Zigbee
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  halow:
+    build:
+      context: ./HaLow
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  lorawan:
+    build:
+      context: ./LoRaWAN
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"
+
+  amqp:
+    build:
+      context: ./amqp
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/logs:/tmp/logs
+    network_mode: "host"

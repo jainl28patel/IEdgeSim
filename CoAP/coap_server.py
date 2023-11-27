@@ -9,8 +9,7 @@ import sys
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000
 
-f = open("./log.txt", "w")
-sys.stdout = f
+f = open("/tmp/logs/CoAPServerlog.txt", "w+")
 
 class Server:
     def __init__(self, host: str, port: int):
@@ -60,7 +59,7 @@ class CoAPServer:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_socket.bind((bind_address, bind_port))
         self.resource_repository = resource_repository
-        print(f"CoAP server listening on {bind_address}:{bind_port}")
+        f.write(f"CoAP server listening on {bind_address}:{bind_port}")
 
     def _parse_coap_message(self, data):
         # Extract CoAP header information
@@ -70,7 +69,7 @@ class CoAPServer:
         #Version encoded in the first 2 bits
         type_code = (version_type_token_length >> 4) & 0b0011
         #Type code in the next 2 bits
-#       print(int(type_code))
+#       f.write(int(type_code))
 
         #The next 1 byte is the request/response layer code ->
         method_code_value = struct.unpack('B', data[1:2])[0]
@@ -108,11 +107,11 @@ class CoAPServer:
     def handle_request(self, data, client_address):
         version, type_code, method_code_value, message_id, uri, payload = self._parse_coap_message(data)
         # Process the CoAP request as needed
-        print(f"Received CoAP {self._get_type_name(int(type_code))} request from {client_address}:")
-        print(f"  The request is for : {self._get_method_name(method_code_value)}")
-        print(f"  Message ID: {message_id}")
-        print(f"  URI: {uri}")
-        print(f"  Payload: {payload}")
+        f.write(f"Received CoAP {self._get_type_name(int(type_code))} request from {client_address}:")
+        f.write(f"  The request is for : {self._get_method_name(method_code_value)}")
+        f.write(f"  Message ID: {message_id}")
+        f.write(f"  URI: {uri}")
+        f.write(f"  Payload: {payload}")
         
         
         response_payload = None
@@ -155,10 +154,10 @@ class CoAPServer:
         else:
             response_code = (4 << 5) | 5   #Represents 4.05 => Method Not allowed
 #            response_payload = "Method not allowed for this resource."
-        # Print the contents of the resource repository
-        print("Contents of Resource Repository:")
+        # f.write the contents of the resource repository
+        f.write("Contents of Resource Repository:")
         for key, value in self.resource_repository.get_all_resources().items():
-            print(f"URI: {key}, Data: {value}")
+            f.write(f"URI: {key}, Data: {value}")
 
         cloudPayload = {
             'method': self._get_method_name(method_code_value),
@@ -173,7 +172,7 @@ class CoAPServer:
         responseCloud = CoAPServer.server.recv_from_cloud()
         t2 = time.time()
         timeElasped = t2 - t1
-        print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+        f.write(f"Timw: {timeElasped*1000} ms\n")
          
         response = self._build_coap_response(response_code, message_id, uri, response_payload)
         self.server_socket.sendto(response, client_address)
@@ -192,7 +191,7 @@ class CoAPServer:
                 request_thread = threading.Thread(target=self.handle_request, args=(data, client_address))
                 request_thread.start()
         except KeyboardInterrupt:
-            print("\nCoAP server stopped.")
+            f.write("\nCoAP server stopped.")
 
 if __name__ == "__main__":
     resource_repository = ThreadSafeResourceRepository()
