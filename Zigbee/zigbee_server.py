@@ -8,7 +8,7 @@ import json
 import time
 import sys
 
-f = open("./log.txt", "w")
+f = open("/tmp/logs/zigbee_server.log", "w+")
 sys.stdout = f
 
 class Node:
@@ -27,8 +27,8 @@ class Node:
         self.network = None
 
     def send_message(self, recipient_address, message):
-        print(f"Node {self.name} is sending message to Node with address {recipient_address}")
-        print(f"Network nodes: {self.network.nodes}")
+        f.write(f"Node {self.name} is sending message to Node with address {recipient_address}")
+        f.write(f"Network nodes: {self.network.nodes}")
         if recipient_address in self.routing_table:
             next_node = self.routing_table[recipient_address]
             if next_node is not None:
@@ -38,7 +38,7 @@ class Node:
 
     def route_message(self, original_sender, recipient_address, message):
         if self.address == recipient_address:
-            print(f"Node {self.name} received a message: {message}")
+            f.write(f"Node {self.name} received a message: {message}")
         else:
             self.routing_table[original_sender] = self
             self.send_message(recipient_address, message)
@@ -50,7 +50,7 @@ class Coordinator(Node):
         self.network = network
 
     def start_network(self):
-        print(f"Coordinator {self.name} is starting the network")
+        f.write(f"Coordinator {self.name} is starting the network")
 
     def add_node_to_network(self, node):
         node.join_network(self.network)
@@ -58,7 +58,7 @@ class Coordinator(Node):
     def route_message(self, sender_name, recipient_address, message):
         sender = next((node for node in self.network.nodes if node.name == sender_name), None)
         recipient = next((node for node in self.network.nodes if node.address == recipient_address), None)
-        print(f"Sender: {sender}, Recipient: {recipient}")
+        f.write(f"Sender: {sender}, Recipient: {recipient}")
         if sender and recipient:
             sender.routing_table[recipient_address] = recipient
             recipient.route_message(sender_name, recipient_address, message)
@@ -71,7 +71,7 @@ class Router(Node):
 
 class EndDevice(Node):
     def route_message(self, original_sender, recipient_address, message):
-        print(f"EndDevice {self.name} received a message: {message}")
+        f.write(f"EndDevice {self.name} received a message: {message}")
 
 
 class Network:
@@ -119,10 +119,10 @@ class Server:
 
     def start(self):
         self.socket.listen()
-        print("Server listening on port {}".format(self.port))
+        f.write("Server listening on port {}".format(self.port))
         while True:
             client, _ = self.socket.accept()
-            print("Client connected")
+            f.write("Client connected")
             threading.Thread(target=self._handle_client, args=(client,)).start()
 
 
@@ -135,15 +135,15 @@ class Server:
                     "node" : msg[1],
                     "payload" : msg[2]
                 }
-                print(f"Received message: {data['payload']} at node {data['node']}")
+                f.write(f"Received message: {data['payload']} at node {data['node']}")
                 t1 = time.time()
                 self.cloud.send_to_cloud(base64.b64encode(json.dumps(data).encode()).decode())
-                print(f"Cloud response: {self.cloud.recv_from_cloud()}")
+                f.write(f"Cloud response: {self.cloud.recv_from_cloud()}")
                 t2 = time.time()
-                print(f"Delay: {(t2-t1)*1000}ms")
+                f.write(f"Time: {(t2-t1)*1000}ms")
             if message.startswith("register:"):
                 client_address = message.split(":", 1)[1]
-                print(f"Client addr {client_address}")
+                f.write(f"Client addr {client_address}")
                 node = next((n for n in self.network.nodes if n.address == client_address), None)
                 if not node:
                     node = Node(client_address)

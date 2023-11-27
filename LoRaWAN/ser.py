@@ -11,8 +11,7 @@ KEY = "Networks_Project"
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000
 
-f = open("./log.txt","w+")
-sys.stdout = f
+f = open("/tmp/logs/lorawanlog.txt", "w+")
 
 class Server:
     def __init__(self, host: str, port: int):
@@ -57,27 +56,27 @@ class GateWay:
     def start(self):
         self.is_running = True
         self.receive_thread.start()
-        print("Gateway started. Waiting for data...")
+        f.write("Gateway started. Waiting for data...")
 
     def stop(self):
         self.is_running = False
         self.server_socket.close()
         self.receive_thread.join()
-        print("\Gateway stopped.")
+        f.write("\Gateway stopped.")
 
     def receive_data(self):
         while self.is_running:
             data, address = self.server_socket.recvfrom(1024)
             packet = LoRaWAN_Packet(data.decode())
             decrypted_data = packet.decrypt()
-            print("Received data:", decrypted_data)
+            f.write("Received data:", decrypted_data)
             t1 = time.time()
             self.server.send_to_cloud(decrypted_data)
-            print("Data sent to Cloud")
+            f.write("Data sent to Cloud")
             response_cloud = self.server.recv_from_cloud()
             t2 = time.time()
-            print(f"Response from the Cloud: {response_cloud.decode()}")
-            print(f"Delay: {(t2-t1)*1000}ms")
+            f.write(f"Response from the Cloud: {response_cloud.decode()}")
+            f.write(f"Time: {(t2-t1)*1000}ms")
 
 if __name__ == "__main__":
     server = GateWay()

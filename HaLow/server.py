@@ -6,8 +6,7 @@ import json
 import time
 import sys
 
-f = open("./log.txt","w+")
-sys.stdout = f
+f = open("/tmp/logs/halow_server.log", "w+")
 
 class State:
     def __init__(self) -> None:
@@ -89,7 +88,7 @@ class Server:
         
     def start(self):
         self._socket.listen()
-        print("Server listening on port {}".format(self._port))
+        f.write("Server listening on port {}".format(self._port))
         while True:
             client, _ = self._socket.accept()
             self.clients.inc_cid()
@@ -99,33 +98,33 @@ class Server:
         with client:
             message = client.recv(1024)
             if message == b"AuthRequest":
-                print("Authenticating client {}".format(cid))
+                f.write("Authenticating client {}".format(cid))
                 # -- authentication --
                 self.clients.bind(cid, client)
-                print("Client {} authenticated!".format(cid))
+                f.write("Client {} authenticated!".format(cid))
                 client.sendall(b"Authenticated!")
 
             while True:
                 message = client.recv(1024)
                 if message == b"rts":
                     self.clients.add_send_queue(cid)
-                    print(self.clients.get_send_queue_len())
+                    f.write(self.clients.get_send_queue_len())
                     if self.clients.get_send_queue_len() == 1:
                         self.clients.pop_send_queue()
                 elif message == b"close":
-                    print("Closing connection to client: {}".format(cid))
+                    f.write("Closing connection to client: {}".format(cid))
                     break
                 elif self.clients.get_sender_allowed() == cid:
-                    print("Message from client {}: {}".format(cid, message))
+                    f.write("Message from client {}: {}".format(cid, message))
                     msg = {
                         "cid" : cid,
                         "data": message.decode() 
                     }
                     t1 = time.time()
                     self.cloud.send_to_cloud(json.dumps(msg))
-                    print(f"Data from Edge: {self.cloud.recv_from_cloud()}")
+                    f.write(f"Data from Edge: {self.cloud.recv_from_cloud()}")
                     t2 = time.time()
-                    print(f"time = {(t2-t1)*1000}ms")
+                    f.write(f"Time: {(t2-t1)*1000}ms")
                     self.clients.pop_send_queue()
 
             self.clients.unbind(cid)

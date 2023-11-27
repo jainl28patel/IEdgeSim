@@ -10,7 +10,7 @@ import socket
 import base64
 import sys
 
-# f = open("../log.txt", "w+")
+f = open("/tmp/logs/mqttlog.txt", "w+")
 # sys.stdout = f
 
 class Server:
@@ -85,12 +85,12 @@ class Topic(ABC):
             responseCloud = Topic.server.recv_from_cloud()
             t2 = time.time()
             timeElasped = t2 - t1
-            print(f"\n...................\nTime took for processing from Cloud: {timeElasped*1000} milli-seconds\n...................\n")
+            f.write(f"Time: {timeElasped*1000} ms\n")
             
             time.sleep(self.topic_client_settings.time_interval)
 
     def on_publish(self, client, userdata, result):
-        print(f'[{time.strftime("%H:%M:%S")}] Data published on: {self.topic_url}')
+        f.write(f'[{time.strftime("%H:%M:%S")}] Data published on: {self.topic_url}')
 
     def generate_payload(self):
         payload = {}

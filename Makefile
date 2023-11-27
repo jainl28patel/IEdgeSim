@@ -7,6 +7,7 @@ buildImage:
 	cd ./mqtt-simulator && docker build -t mqtt-simulator .
 	cd ./HaLow && docker build -t halow .
 	cd ./Zigbee && docker build -t zigbee .
+	cd ./LoRaWAN && docker build -t lora .
 
 runEdgeNetwork:
 	docker run -it --rm --network="host" -v "$(PWD)":/usr/src/app --name cloudserver cloudserver
@@ -43,3 +44,6 @@ runTest:
 	docker run -it  --network="host" -v "$(pwd)/mqtt-simulator:/usr/src/app" --name mqtt-simulator mqtt-simulator
 	docker run -it  --network="host" -v "$(pwd)/CoAP:/usr/src/app" --name coap coap
 	docker run -it  --network="host" -v "$(pwd)/amqp:/usr/src/app" --name amqp amqp
+	docker run -it  --network="host" -v "$(pwd)/HaLow:/usr/src/app" --name halow halow
+	docker run -it  --network="host" -v "$(pwd)/Zigbee:/usr/src/app" --name lora lora
+	docker run -it  --network="host" --name coap coap

@@ -3,6 +3,8 @@ import struct
 import random
 import time
 
+f = open("/tmp/logs/CoAPClientlog.txt", "w+")
+
 class EdgeCoAPCache:
     def __init__(self):
         self.cache = {}
@@ -127,7 +129,7 @@ class CoAPClientWithCaching:
         cached_data = self.edge_cache.get_from_cache(uri)
 
         if cached_data:
-            print(f"Found {uri} in edge cache. Returning cached data: {cached_data}")
+            f.write(f"Found {uri} in edge cache. Returning cached data: {cached_data}")
             return cached_data
 
         try:
@@ -138,8 +140,8 @@ class CoAPClientWithCaching:
 #            self.edge_cache.update_cache(uri, response)
             #response.decode('utf-8')
 #            print(f"Received message : {uri}: {message}")
-            print("Cache after GET operation:")
-            print(self.edge_cache.show_cache())
+            f.write("Cache after GET operation:")
+            f.write(self.edge_cache.show_cache())
             return None
 
         except Exception as e:
