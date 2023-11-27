@@ -4,7 +4,7 @@ import base64
 import json
 
 SERVER_IP = '127.0.0.50'
-SERVER_PORT = 5000
+SERVER_PORT = 5002
 KEY = "Networks_Project"
 CLOUD_HOST = "127.0.0.1"
 CLOUD_PORT = 8000

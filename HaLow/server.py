@@ -129,5 +129,5 @@ class Server:
 if __name__ == "__main__":
     print("Starting Server...")
     state = State()
-    server = Server(5000, state)
+    server = Server(5001, state)
     server.start()
