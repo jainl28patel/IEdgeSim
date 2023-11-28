@@ -1,4 +1,4 @@
-from zigbee import Coordinator, Router, EndDevice, Network
+from server import Coordinator, Router, EndDevice, Network
 
 if __name__ == "__main__":
    coordinator = Coordinator("C", None)
